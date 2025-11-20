@@ -88,7 +88,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <main className="grid-1-1 is-full-page" id="main">
           <section
             className="u-flex u-flex-vertical"
-            style={{ background: `url(${bgImage}) no-repeat` }}
+            style={{
+              backgroundImage: `url(${bgImage})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
           >
             <div className="tag-line is-not-mobile">
               <p>
@@ -108,7 +113,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </section>
           <section className="grid-1-1-col-2 u-flex u-main-center u-cross-center _u-padding-16-mobile">
-            <div className="container u-flex u-flex-vertical u-cross-center u-main-center">
+            <div className="u-flex u-flex-vertical u-cross-center u-main-center container">
               {children}
             </div>
           </section>
@@ -143,11 +148,11 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
+    <main className="container mx-auto p-4 pt-16">
       <h1>{message}</h1>
       <p>{details}</p>
       {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
+        <pre className="w-full overflow-x-auto p-4">
           <code>{stack}</code>
         </pre>
       )}
