@@ -46,7 +46,7 @@ const requireAuth: Route.MiddlewareFunction = async ({ request, context }) => {
   }
 
   if (user && ["/signin", "/signup"].includes(url.pathname)) {
-    throw redirect(new URL("/account", url).toString());
+    throw redirect(new URL("/admin/account", url).toString());
   }
 };
 
