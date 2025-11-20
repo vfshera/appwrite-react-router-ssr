@@ -13,6 +13,7 @@
         "dotenv": "^17.2.3",
         "dotenv-expand": "^12.0.3",
         "isbot": "^5.1.31",
+        "node-appwrite": "^20.3.0",
         "picocolors": "^1.1.1",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
@@ -781,6 +782,10 @@
     "natural-compare": ["natural-compare@1.4.0", "", {}, "sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw=="],
 
     "negotiator": ["negotiator@0.6.4", "", {}, "sha512-myRT3DiWPHqho5PrJaIRyaMv2kgYf0mUVgBNOYMuCH5Ki1yEiQaf/ZJuQ62nvpc44wL5WDbTX7yGJi1Neevw8w=="],
+
+    "node-appwrite": ["node-appwrite@20.3.0", "", { "dependencies": { "node-fetch-native-with-agent": "1.7.2" } }, "sha512-vaxlpkNTtjkccyngwc9HRSwQQasZ/CJri6KMZ62mlDAM1YdvOgqIM8EYJwvhx/fiHdyjfxithFcmnvzUR9TGTQ=="],
+
+    "node-fetch-native-with-agent": ["node-fetch-native-with-agent@1.7.2", "", {}, "sha512-5MaOOCuJEvcckoz7/tjdx1M6OusOY6Xc5f459IaruGStWnKzlI1qpNgaAwmn4LmFYcsSlj+jBMk84wmmRxfk5g=="],
 
     "node-releases": ["node-releases@2.0.27", "", {}, "sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA=="],
 

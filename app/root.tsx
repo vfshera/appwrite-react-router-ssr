@@ -3,6 +3,7 @@ import {
   Links,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
 } from "react-router";
@@ -12,6 +13,47 @@ import type { Route } from "./+types/root";
 import "@appwrite.io/pink";
 import "@appwrite.io/pink-icons";
 import "./app.css";
+import { createSessionClient } from "./lib/appwrite.server";
+import type { Models } from "node-appwrite";
+import { userContext } from "./context";
+
+const authMiddleware: Route.MiddlewareFunction = async ({
+  request,
+  context,
+}) => {
+  try {
+    const { account } = await createSessionClient(request);
+
+    const user = (await account.get()) as Models.User | null;
+
+    context.set(userContext, user || null);
+  } catch (err) {
+    console.log("[authMiddleware error]", { err });
+
+    context.set(userContext, null);
+  }
+};
+
+const requireAuth: Route.MiddlewareFunction = async ({ request, context }) => {
+  const url = new URL(request.url);
+
+  const user = context.get(userContext);
+
+  if (url.pathname.startsWith("/admin") && !user) {
+    const to = new URL("/signin", url);
+
+    throw redirect(to.toString());
+  }
+
+  if (user && ["/signin", "/signup"].includes(url.pathname)) {
+    throw redirect(new URL("/account", url).toString());
+  }
+};
+
+export const middleware: Route.MiddlewareFunction[] = [
+  authMiddleware,
+  requireAuth,
+];
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -50,7 +92,9 @@ export default function App() {
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
+
   let details = "An unexpected error occurred.";
+
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
