@@ -1,7 +1,31 @@
-export default function Index() {
+import { Link } from "react-router";
+import type { Route } from "./+types/_index";
+
+export default function Index({ matches }: Route.ComponentProps) {
+  const { user } = matches[0].loaderData;
+
   return (
-    <div>
-      <h1>Welcome to the Appwrite + React Router SSR Playground!</h1>
+    <div className="flex flex-col gap-6 min-w-[300px]">
+      {user ? (
+        <>
+          <p style={{ fontSize: "1.25rem" }}>Hello {user.name || user.email}</p>
+          <Link
+            to="/admin/account"
+            className="button is-secondary is-full-width"
+          >
+            Go to Account
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link to="/signin" className="button is-secondary is-full-width">
+            Sign in
+          </Link>
+          <Link to="/signup" className="button is-secondary is-full-width">
+            Sign up
+          </Link>
+        </>
+      )}
     </div>
   );
 }
