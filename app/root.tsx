@@ -8,6 +8,9 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+
+import "@appwrite.io/pink";
+import "@appwrite.io/pink-icons";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
