@@ -9,13 +9,15 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
-
+import "./app.css";
 import "@appwrite.io/pink";
 import "@appwrite.io/pink-icons";
-import "./app.css";
+
 import { createSessionClient } from "./lib/appwrite.server";
 import type { Models } from "node-appwrite";
 import { userContext } from "./context";
+import bgImage from "~/assets/images/login-dark-mode.png";
+import logo from "~/assets/images/appwrite-logo-dark.svg";
 
 const authMiddleware: Route.MiddlewareFunction = async ({
   request,
@@ -27,9 +29,7 @@ const authMiddleware: Route.MiddlewareFunction = async ({
     const user = (await account.get()) as Models.User | null;
 
     context.set(userContext, user || null);
-  } catch (err) {
-    console.log("[authMiddleware error]", { err });
-
+  } catch {
     context.set(userContext, null);
   }
 };
@@ -68,17 +68,51 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+export async function loader({ context }: Route.LoaderArgs) {
+  const user = context.get(userContext);
+
+  return { user };
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
+      <body className="theme-dark">
+        <main className="grid-1-1 is-full-page" id="main">
+          <section
+            className="u-flex u-flex-vertical"
+            style={{ background: `url(${bgImage}) no-repeat` }}
+          >
+            <div className="tag-line is-not-mobile">
+              <p>
+                Server side rendering<span className="underscore">_</span>
+              </p>
+            </div>
+            <div className="u-flex u-stretch" />
+            <div className="logo u-flex u-gap-16">
+              <a href="/">
+                <img
+                  src={logo}
+                  width="160"
+                  className="u-block"
+                  alt="Appwrite Logo"
+                />
+              </a>
+            </div>
+          </section>
+          <section className="grid-1-1-col-2 u-flex u-main-center u-cross-center _u-padding-16-mobile">
+            <div className="container u-flex u-flex-vertical u-cross-center u-main-center">
+              {children}
+            </div>
+          </section>
+        </main>
         <ScrollRestoration />
         <Scripts />
       </body>
