@@ -3,11 +3,24 @@ import { expand } from "dotenv-expand";
 import { z } from "zod";
 import pc from "picocolors";
 
-export const EnvSchema = z.object({
-  APPWRITE_ENDPOINT: z.url(),
-  APPWRITE_PROJECT_ID: z.string().min(1),
-  APPWRITE_API_KEY: z.string().min(1),
-});
+export const EnvSchema = z
+  .object({
+    APP_SECRET: z.string().optional(),
+    APPWRITE_ENDPOINT: z.url(),
+    APPWRITE_PROJECT_ID: z.string().min(1),
+    APPWRITE_API_KEY: z.string().min(1),
+    NODE_ENV: z
+      .enum(["development", "production", "test"])
+      .default("development"),
+  })
+  .transform((env) => {
+    return {
+      ...env,
+      PROD: env.NODE_ENV === "production",
+      DEV: env.NODE_ENV === "development",
+      TEST: env.NODE_ENV === "test",
+    };
+  });
 
 export type EnvSchemaType = z.infer<typeof EnvSchema>;
 
