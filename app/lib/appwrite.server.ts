@@ -1,15 +1,6 @@
 import { Account, Client } from "node-appwrite";
-import { createCookie } from "react-router";
 import { env } from "~/utils/env.server";
-
-export const SESSION_COOKIE_NAME = "appwrite-qwik-ssr-session";
-
-export const sessionCookie = createCookie(SESSION_COOKIE_NAME, {
-  path: "/",
-  httpOnly: true,
-  sameSite: "strict",
-  secure: true,
-});
+import { getSession } from "~/utils/session.server";
 
 /**
  * Admin client, used to create new accounts
@@ -32,18 +23,18 @@ export function createAdminClient() {
  * Session client, used to make requests on behalf of the logged in user
  */
 export async function createSessionClient(request: Request) {
-  const session = (await sessionCookie.parse(request.headers.get("Cookie"))) as
-    | string
-    | null;
+  const session = await getSession(request.headers.get("Cookie"));
 
-  if (!session) {
+  const authSecret = session.get("auth");
+
+  if (!authSecret) {
     throw new Error("Session not found!");
   }
 
   const client = new Client()
     .setEndpoint(env.APPWRITE_ENDPOINT)
     .setProject(env.APPWRITE_PROJECT_ID)
-    .setSession(session);
+    .setSession(authSecret);
 
   // Return the services you need
   return {

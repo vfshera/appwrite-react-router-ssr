@@ -2,7 +2,8 @@ import type { CSSProperties } from "react";
 import type { Route } from "./+types/signin";
 import { Form, Link, redirect } from "react-router";
 import z from "zod";
-import { createAdminClient, sessionCookie } from "~/lib/appwrite.server";
+import { createAdminClient } from "~/lib/appwrite.server";
+import { commitSession, getSession } from "~/utils/session.server";
 
 const signInSchema = z.object({
   email: z.email(),
@@ -30,9 +31,13 @@ export async function action({ request }: Route.ActionArgs) {
       return { message: "Failed to sign in" };
     }
 
+    const cookieSession = await getSession();
+
+    cookieSession.set("auth", session.secret);
+
     return redirect(redirectTo, {
       headers: {
-        "Set-Cookie": await sessionCookie.serialize(session.secret, {
+        "Set-Cookie": await commitSession(cookieSession, {
           expires: new Date(session.expire),
         }),
       },
