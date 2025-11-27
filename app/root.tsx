@@ -15,7 +15,7 @@ import "@appwrite.io/pink-icons";
 
 import { createSessionClient } from "./lib/appwrite.server";
 import type { Models } from "node-appwrite";
-import { userContext } from "./context";
+import { userContext } from "./context.server";
 import bgImage from "~/assets/images/login-dark-mode.png";
 import logo from "~/assets/images/appwrite-logo-dark.svg";
 

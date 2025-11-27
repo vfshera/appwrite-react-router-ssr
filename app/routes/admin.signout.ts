@@ -1,7 +1,7 @@
 import { createSessionClient } from "~/lib/appwrite.server";
 import type { Route } from "./+types/admin.signout";
 import { redirect } from "react-router";
-import { destroySession, getSession } from "~/utils/session.server";
+import { destroySession, getSession } from "~/session.server";
 
 export async function action({ request }: Route.ActionArgs) {
   const session = await getSession(request.headers.get("Cookie"));
@@ -10,7 +10,7 @@ export async function action({ request }: Route.ActionArgs) {
 
   await account.deleteSession({ sessionId: "current" });
 
-  throw redirect("/", {
+  return redirect("/", {
     headers: {
       "Set-Cookie": await destroySession(session),
     },

@@ -1,5 +1,5 @@
 import { createCookieSessionStorage } from "react-router";
-import { env } from "./env.server";
+import { env } from "./utils/env.server";
 
 export const SESSION_COOKIE_NAME = "appwrite-react-router-session";
 
@@ -7,7 +7,9 @@ type SessionData = {
   auth?: string;
 };
 
-type FlashData = object;
+type FlashData = {
+  error?: string;
+};
 
 export const { commitSession, destroySession, getSession } =
   createCookieSessionStorage<SessionData, FlashData>({

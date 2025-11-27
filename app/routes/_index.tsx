@@ -5,7 +5,7 @@ export default function Index({ matches }: Route.ComponentProps) {
   const { user } = matches[0].loaderData;
 
   return (
-    <div className="flex flex-col gap-6 min-w-[300px]">
+    <div className="flex! min-w-[300px]! flex-col! gap-6!">
       {user ? (
         <>
           <p style={{ fontSize: "1.25rem" }}>Hello {user.name || user.email}</p>

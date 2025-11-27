@@ -1,6 +1,6 @@
 import { Account, Client } from "node-appwrite";
 import { env } from "~/utils/env.server";
-import { getSession } from "~/utils/session.server";
+import { getSession } from "~/session.server";
 
 /**
  * Admin client, used to create new accounts
