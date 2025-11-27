@@ -1,14 +1,13 @@
 import type { CSSProperties } from "react";
 import type { Route } from "./+types/signin";
-import { Form, Link, redirect } from "react-router";
+import { data, Link, redirect, useFetcher } from "react-router";
 import z from "zod";
 import { createAdminClient } from "~/lib/appwrite.server";
-import { commitSession, getSession } from "~/utils/session.server";
+import { commitSession, getSession } from "~/session.server";
 
 const signInSchema = z.object({
   email: z.email(),
   password: z.string(),
-  redirectTo: z.string().optional(),
 });
 
 export async function action({ request }: Route.ActionArgs) {
@@ -16,28 +15,37 @@ export async function action({ request }: Route.ActionArgs) {
 
   const values = signInSchema.safeParse(Object.fromEntries(formData));
 
+  const newSession = await getSession();
+
   if (!values.success) {
-    return values.error;
+    const { properties } = z.treeifyError(values.error);
+
+    const errors = properties
+      ? Object.entries(properties).reduce(
+          (acc, [key, value]) => {
+            acc[key] = value.errors;
+
+            return acc;
+          },
+          {} as Record<string, string[]>,
+        )
+      : undefined;
+
+    return data({ errors, message: "Invalid form data" }, { status: 422 });
   }
 
-  const { redirectTo = "/admin/account", ...credentials } = values.data;
+  const credentials = values.data;
 
   try {
     const { account } = createAdminClient();
 
     const session = await account.createEmailPasswordSession(credentials);
 
-    if (!session) {
-      return { message: "Failed to sign in" };
-    }
+    newSession.set("auth", session.secret);
 
-    const cookieSession = await getSession();
-
-    cookieSession.set("auth", session.secret);
-
-    return redirect(redirectTo, {
+    return redirect("/admin/account", {
       headers: {
-        "Set-Cookie": await commitSession(cookieSession, {
+        "Set-Cookie": await commitSession(newSession, {
           expires: new Date(session.expire),
         }),
       },
@@ -48,13 +56,17 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function Signin() {
+  const fetcher = useFetcher();
+
+  const errors = fetcher.data?.errors as Record<string, string[]> | undefined;
+
   return (
     <div className="u-max-width-500 u-width-full-line">
       <h1 className="heading-level-2 u-margin-block-start-auto">
         Demo sign in
       </h1>
       <div className="u-margin-block-start-24">
-        <Form className="form common-section" method="post">
+        <fetcher.Form className="form common-section" method="POST">
           <ul
             className="form-list"
             style={{ "--form-list-gap": "1.5rem" } as CSSProperties}
@@ -84,10 +96,14 @@ export default function Signin() {
                   placeholder="Email"
                   type="email"
                   className="input-text"
-                  autoComplete="off"
-                  //   value={action.formData?.get("email")}
+                  defaultValue={String(fetcher.formData?.get("email") || "")}
                   required
                 />
+                {errors?.email && (
+                  <p className="text-sm text-red-600">
+                    {errors.email.join(" ")}
+                  </p>
+                )}
               </div>
             </li>
             <li className="form-item">
@@ -105,8 +121,7 @@ export default function Signin() {
                   minLength={8}
                   type="password"
                   className="input-text"
-                  autoComplete="off"
-                  //   value={action.formData?.get("password")}
+                  defaultValue={String(fetcher.formData?.get("password") || "")}
                   required
                 />
                 <button
@@ -117,6 +132,11 @@ export default function Signin() {
                   <span aria-hidden="true" className="icon-eye" />
                 </button>
               </div>
+              {errors?.password && (
+                <p className="text-sm text-red-600">
+                  {errors.password.join(" ")}
+                </p>
+              )}
             </li>
             <li className="form-item">
               <button className="button is-full-width" type="submit">
@@ -126,12 +146,7 @@ export default function Signin() {
             <span className="with-separators eyebrow-heading-3">or</span>
             <li className="form-item"></li>
           </ul>
-        </Form>
-
-        {/* <button className="button is-github is-full-width" type="button">
-            <span className="icon-github" aria-hidden="true" />
-            <span className="text">Sign up with GitHub</span>
-          </button> */}
+        </fetcher.Form>
       </div>
       <ul className="inline-links is-center is-with-sep u-margin-block-start-32">
         <li className="inline-links-item">
